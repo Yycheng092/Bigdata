@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block title %}
+  熱門人物
+{% endblock %}
+{% block content %}
+  <div class="col-lg-12">
+    <h1>熱門人物</h1>
+    <p>哪個人物被報導最多次?</p>
+  </div>
+
+  <!-- 篩選條件區塊 -->
+  <div class="col-lg-6 mb-5">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">篩選條件 (資料週期: 資料截止前4周)</h3>
+      </div>
+      <div class="card-body">
+        <!-- 新聞類別 -->
+        <div class="mb-3 row">
+          <label class="col-sm-3 form-label">新聞類別</label>
+          <div class="col-md-9">
+            <!-- 此處依據 CSV 檔案中的分類，修改 radio 的 value -->
+
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="政治" name="cateradio" id="catePolitics" />
+              <label class="form-check-label" for="catePolitics">政治</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="社會地方" name="cateradio" id="cateLocalSociety" />
+              <label class="form-check-label" for="cateLocalSociety">社會地方</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="財經" name="cateradio" id="cateFinance" />
+              <label class="form-check-label" for="cateFinance">財經</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="運動" name="cateradio" id="cateSports" />
+              <label class="form-check-label" for="cateSports">運動</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="娛樂影劇" name="cateradio" id="cateInternational" />
+              <label class="form-check-label" for="cateInternational">娛樂影劇</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="科技" name="cateradio" id="cateInternational" />
+              <label class="form-check-label" for="cateInternational">科技</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="全部" name="cateradio" id="cateAll" checked />
+              <label class="form-check-label" for="cateAll">全部</label>
+            </div>
+            <div class="form-text">新聞類別內定值為 "全部"</div>
+          </div>
+        </div>
+        <!-- 熱門關鍵字數量 -->
+        <div class="mb-3 row">
+          <label class="col-md-3 form-label">多少個熱門詞?</label>
+          <div class="col-md-9">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="5" name="topkradio" id="topk1" />
+              <label class="form-check-label" for="topk1">5</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="10" name="topkradio" id="topk10" checked />
+              <label class="form-check-label" for="topk10">10</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="20" name="topkradio" id="topk20" />
+              <label class="form-check-label" for="topk20">20</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="30" name="topkradio" id="topk30" />
+              <label class="form-check-label" for="topk30">30</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="40" name="topkradio" id="topk40" />
+              <label class="form-check-label" for="topk40">40</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="50" name="topkradio" id="topk50" />
+              <label class="form-check-label" for="topk50">50</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="60" name="topkradio" id="topk60" />
+              <label class="form-check-label" for="topk60">60</label>
+            </div>
+            <div class="form-text">內定值為10</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 繪圖區塊 -->
+  <div class="col-lg-6 mb-5">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">熱門關鍵字繪圖</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="mychart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- 熱門關鍵字清單 -->
+  <div class="col-lg-6 mb-5">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">熱門關鍵字 (頻率次數)</h3>
+      </div>
+      <div class="card-body">
+        <ul id="topkeys"></ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block extra_js %}
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+  <script>
+    // 載入頁面時呼叫 ajax
+    call_ajax()
+    
+    // 當新聞類別改變時重新呼叫 ajax
+    $("input[name='cateradio']").on('change', function () {
+      call_ajax()
+    })
+    
+    // 當熱門詞數量改變時重新呼叫 ajax
+    $("input[name='topkradio']").on('change', function () {
+      call_ajax()
+    })
+    
+    function call_ajax() {
+      const cate = $("input[name='cateradio']:checked").val()
+      const topk = $("input[name='topkradio']:checked").val()
+      $.ajax({
+        type: 'POST',
+        url: '/top_person/api_get_topPerson/',
+        data: { news_category: cate, topk: topk },
+        success: function (received) {
+          let chart_data = received.chart_data
+          let wf_pairs = received.wf_pairs
+          console.log(wf_pairs)
+          showChart(chart_data)
+          showTopKeys(wf_pairs)
+        }
+      })
+    }
+    
+    // 顯示熱門關鍵字列表
+    function showTopKeys(items) {
+      $('#topkeys').empty()
+      for (let i = 0; i < items.length; i++) {
+        let item_li = '<li>' + items[i] + '</li>'
+        $('#topkeys').append(item_li)
+      }
+    }
+    
+    // 畫圖函數
+    function showChart(chart_data) {
+      let values = chart_data.values
+      let labels = chart_data.labels
+      let category = chart_data.category
+    
+      let data = {
+        labels: labels,
+        datasets: [
+          {
+            label: category,
+            data: values,
+            backgroundColor: randomColors(values.length),
+            borderColor: randomColors(values.length),
+            borderWidth: 1
+          }
+        ]
+      }
+    
+      let options = {
+        scales: {
+          yAxes: [
+            {
+              ticks: { beginAtZero: true }
+            }
+          ]
+        }
+      }
+    
+      let canvas = document.getElementById('mychart')
+      if (window.barchart) {
+        barchart.destroy()
+      }
+      barchart = new Chart(canvas, {
+        type: 'bar',
+        data: data,
+        options: options
+      })
+    
+      function randomColors(num) {
+        let colors = []
+        for (let i = 0; i < num; i++) {
+          let r = Math.floor(Math.random() * 255)
+          let g = Math.floor(Math.random() * 255)
+          let b = Math.floor(Math.random() * 255)
+          colors.push(`rgba(${r},${g},${b},0.5)`)
+        }
+        return colors
+      }
+    }
+  </script>
+{% endblock %}

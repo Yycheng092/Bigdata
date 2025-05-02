@@ -1,0 +1,80 @@
+body {
+    font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+    background-color: #f5f6fa;
+}
+
+h1,
+h3 {
+    color: #2c3e50;
+}
+
+.card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-body {
+    border: 1px dashed #ccc;
+}
+
+button.btn-primary {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* 🔥 自動多欄清單關鍵樣式 */
+.topkey-wrapper {
+    height: 20em;
+    overflow: hidden;
+}
+
+.topkey-list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(10, auto);
+    grid-auto-columns: max-content;
+    height: 100%;
+    gap: 0.4em 2em;
+    list-style-type: disc;
+    padding-left: 1rem;
+    margin: 0;
+    align-content: start;
+}
+
+.topkey-list li {
+    white-space: nowrap;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* 讓外層容器可以出現水平或垂直的捲軸 */
+.topkeys-scroll-wrapper {
+    /* 如果想要水平捲軸，重點是寬度要有限制，超出才會滾動 */
+    max-width: 100%;
+    overflow-x: auto;
+    /* 若想在高度上也有限制，就自行加上 max-height */
+    /* max-height: 500px; overflow-y: auto; */
+}
+
+/* 原本的 flex 排欄不變 */
+#topkeys-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: nowrap;
+    /* 關鍵：不讓欄自動換行 */
+    min-width: fit-content;
+}
+
+/* 讓每個欄位(UL)保持基本樣式 */
+#topkeys-container ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    /* 讓符號在內容區塊內 */
+    margin: 0;
+    padding-left: 0.5rem;
+    /* 視需要微調左側內距，讓符號更整齊 */
+}
+
+/* 避免中文或文字被自動斷行 */
+#topkeys-container li {
+    white-space: nowrap;
+}

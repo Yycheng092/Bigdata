@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  XXX聲量觀察
+{% endblock %}
+
+{% block extra_css %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 mb-3">
+        <h1>XXX聲量觀察</h1>
+        <p>你關心的人事物</p>
+      </div>
+
+      <div class="col-12 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="h6 text-uppercase mb-0">資料週期:資料截止時間 2025-04-08</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h3>網路聲量</h3>
+                <p>新聞報導有多少篇新聞提及這組關鍵字，聲量越高表示能見度越高。</p>
+                <p>總篇數: 有多少篇新聞提到；總次數: 在相關新聞中被提到多少次</p>
+
+                <form id="keywordForm" class="mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="text" class="form-control me-2" id="keywordInput" placeholder="請輸入關鍵字" style="max-width: 300px;" />
+                    <button class="btn btn-primary" type="button">確認</button>
+                  </div>
+                </form>
+
+                <div id="keywordResult" class="mt-3 text-primary fw-bold fs-4"></div>
+              </div>
+
+              <div class="col-md-6">
+                <div id="share_of_voice" class="mt-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 聲量圖表 -->
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="h6 text-uppercase mb-0">聲量分布情況</h3>
+          </div>
+          <div class="card-body">
+            <h3>依據新聞類別統計網路聲量</h3>
+            <p>在哪一類別的新聞中被報導最多篇？</p>
+            <hr />
+            <canvas id="bar_chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="h6 text-uppercase mb-0">聲量變化</h3>
+          </div>
+          <div class="card-body">
+            <h3>依據時間顯示聲量的變化</h3>
+            <p>在哪個時間點被新聞報導最多？</p>
+            <hr />
+            <canvas id="line_chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+
+  <script>
+    let barChart, lineChart
+    
+    $(document).ready(function () {
+      console.log('✅ jQuery 就緒')
+    
+      // 按下查詢按鈕時
+      $('#keywordForm button').on('click', function () {
+        const keyword = $('#keywordInput').val().trim()
+        const resultDiv = $('#keywordResult')
+        resultDiv.text('')
+        $('#share_of_voice').empty()
+    
+        if (!keyword) {
+          alert('請輸入關鍵字！')
+    
+          // 🧽 清空圖表
+          if (barChart) {
+            barChart.destroy()
+            barChart = null
+          }
+          if (lineChart) {
+            lineChart.destroy()
+            lineChart = null
+          }
+    
+          return
+        }
+    
+        if (!keyword) {
+          alert('請輸入關鍵字！')
+          return
+        }
+    
+        const csrftoken = getCookie('csrftoken')
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'app_top_voice:api_cate_topvoice' %}",
+          data: {
+            keyword: keyword,
+            csrfmiddlewaretoken: csrftoken
+          },
+          success: function (data) {
+            if (data.status === 'success') {
+              resultDiv.text('"' + keyword + '" 出現在 ' + data.count + ' 篇新聞中，共被提及 ' + data.frequency + ' 次')
+    
+              var html = ''
+              if (data.photo_link && data.link) {
+                html += '<img src="' + data.photo_link + '" class="img-fluid rounded mb-2" alt="新聞圖片" style="max-height: 200px; width: auto;">'
+                html += '<p><a href="' + data.link + '" target="_blank" class="btn btn-outline-primary btn-sm">🔗 點我看該篇新聞</a></p>'
+              } else {
+                html = '<p class="text-muted">無可用圖片或連結</p>'
+              }
+    
+              $('#share_of_voice').html(html)
+              updateCharts(keyword)
+            } else {
+              resultDiv.text('查詢錯誤：' + data.message)
+            }
+          },
+          error: function (xhr, status, error) {
+            resultDiv.text(`請求失敗：${error}`)
+          }
+        })
+      })
+    
+      // AJAX 請求後端圖表資料
+      function updateCharts(keyword = '') {
+        const csrftoken = getCookie('csrftoken')
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'app_top_voice:api_news_volume_data' %}",
+          data: {
+            keyword: keyword,
+            csrfmiddlewaretoken: csrftoken
+          },
+          success: function (data) {
+            if (data.status === 'success') {
+              renderCategoryChart(data.category_count)
+              renderDateChart(data.date_count)
+            } else {
+              console.error('圖表資料錯誤：', data.message)
+            }
+          }
+        })
+      }
+    
+      // 繪製分類長條圖
+      function renderCategoryChart(categoryData) {
+        if (barChart) barChart.destroy()
+        const ctx = document.getElementById('bar_chart').getContext('2d')
+        barChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(categoryData),
+            datasets: [
+              {
+                label: '新聞數量',
+                data: Object.values(categoryData),
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: true,
+              text: '依新聞類別統計'
+            },
+            scales: {
+              yAxes: [
+                {
+                  ticks: { beginAtZero: true }
+                }
+              ]
+            }
+          }
+        })
+      }
+    
+      // 繪製時間折線圖
+      function renderDateChart(dateData) {
+        if (lineChart) lineChart.destroy()
+        const ctx = document.getElementById('line_chart').getContext('2d')
+        lineChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: Object.keys(dateData),
+            datasets: [
+              {
+                label: '每日新聞數',
+                data: Object.values(dateData),
+                fill: false,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                lineTension: 0.1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: true,
+              text: '聲量時間變化'
+            },
+            scales: {
+              xAxes: [
+                {
+                  type: 'time',
+                  time: {
+                    unit: 'day',
+                    tooltipFormat: 'YYYY-MM-DD',
+                    displayFormats: {
+                      day: 'YYYY-MM-DD'
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        })
+      }
+    
+      // CSRF 取得函數
+      function getCookie(name) {
+        let cookieValue = null
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';')
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim()
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+              break
+            }
+          }
+        }
+        return cookieValue
+      }
+    })
+  </script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  LINE Today 熱門電影榜
+{% endblock %}
+
+{% block content %}
+  <style>
+    .movie-summary-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 4px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      background-color: #f9f9f9;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .movie-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      margin-bottom: 5px;
+    }
+    .movie-poster {
+      height: 5cm;
+      width: auto;
+      border-radius: 4px;
+    }
+    .movie-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .movie-content {
+      display: flex;
+      flex-direction: column;
+      height: 5cm;
+    }
+    .movie-title {
+      margin: 0;
+      font-size: 18px;
+    }
+    .review-icon {
+      font-size: 24px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .review-icon:hover {
+      color: #0056b3;
+    }
+    /* 固定高度容器，內容超出時顯示滾動條 */
+    .scroll-container {
+      max-height: 700px;
+      overflow-y: auto;
+    }
+  </style>
+
+  <div class="container mt-4">
+    <!-- Row 1：第三欄與第四欄 -->
+    {% comment %} <div class="row">
+      <!-- 第三欄：僅顯示電影海報、電影名稱、上映日期與簡介 -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5>第三欄標題</h5>
+          </div>
+          <div class="card-body scroll-container">
+            {% for item in third_data %}
+              <div class="movie-row mb-4">
+                <img src="{{ item.image }}" alt="{{ item.title }}" class="movie-poster shadow-sm" />
+                <div class="movie-content" style="flex: 1;">
+                  <div class="movie-header">
+                    <h5 class="movie-title">{{ item.title }}</h5>
+                  </div>
+                  <div class="movie-info">
+                    <p>上映日期：{{ item.release_time|default:'未知' }}</p>
+                  </div>
+                  <div class="movie-summary-box">{{ item.summary|default:'尚無簡介' }}</div>
+                </div>
+              </div>
+              <hr />
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 第四欄 -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5>第四欄標題</h5>
+          </div>
+          <div class="card-body scroll-container">
+            {% for item in fourth_data %}
+              <div class="movie-row mb-4">
+                <img src="{{ item.image }}" alt="{{ item.title }}" class="movie-poster shadow-sm" />
+                <div class="movie-content" style="flex: 1;">
+                  <div class="movie-header">
+                    <h5 class="movie-title">{{ item.title }}</h5>
+                    <a href="{{ item.link }}" target="_blank" class="btn btn-sm btn-outline-info">觀看更多</a>
+                  </div>
+                  <div class="movie-summary-box">{{ item.summary|default:'尚無簡介' }}</div>
+                </div>
+              </div>
+              <hr />
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div> {% endcomment %}
+
+    <!-- Row 2：電影聲量榜與本周新片 -->
+    <div class="row mt-4">
+      <!-- 電影聲量榜區塊 -->
+      <div class="col-md-7.5">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5>電影聲量榜🌟</h5>
+          </div>
+          <div class="card-body scroll-container">
+            {% for movie in movies %}
+              <div class="movie-row mb-4">
+                <img src="{{ movie.image }}" alt="{{ movie.title }}" class="movie-poster shadow-sm" />
+                <div class="movie-content" style="flex: 1;">
+                  <div class="movie-header">
+                    <h5 class="movie-title">{{ movie.title }}</h5>
+                    <a href="{{ movie.link }}" target="_blank" class="review-icon">🎥</a>
+                  </div>
+                  <div class="movie-summary-box">{{ movie.summary|default:'尚無簡介' }}</div>
+                </div>
+              </div>
+              <hr />
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 本周新片區塊 -->
+      <div class="col-md-4.5">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5>本周新片</h5>
+          </div>
+          <div class="card-body scroll-container">
+            {% for movie in new_movies %}
+              <div class="movie-row mb-4">
+                <img src="{{ movie.img_url }}" alt="{{ movie.title }}" class="movie-poster shadow-sm" />
+                <div class="movie-content" style="flex: 1;">
+                  <div class="movie-header">
+                    <h5 class="movie-title">{{ movie.title }}</h5>
+                    <!-- 新增評論圖標，點選後前往 review_url（已帶 /2 的評論網址） -->
+                    <a href="{{ item.review_url|default:'#' }}" target="_blank" class="review-icon" title="前往評論"><i class="fa fa-comments-o"></i></a>
+                  </div>
+                  <div class="movie-info">
+                    <p>放映時長：{{ movie.show_time|default:'未知' }}</p>
+                    <p>上映日期：{{ movie.release_time|default:'未知' }}</p>
+                    <a href="{{ movie.trailer_link }}" target="_blank" class="btn btn-sm btn-outline-info">觀看預告片</a>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
