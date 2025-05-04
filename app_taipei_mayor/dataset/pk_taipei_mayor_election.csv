@@ -1,0 +1,10 @@
+name,value
+list_freq_daily_line_chart,"[[{'x': '2025-04-04', 'y': 4}, {'x': '2025-04-05', 'y': 14}, {'x': '2025-04-06', 'y': 19}, {'x': '2025-04-07', 'y': 49}, {'x': '2025-04-08', 'y': 143}], [{'x': '2025-04-04', 'y': 0}, {'x': '2025-04-05', 'y': 0}, {'x': '2025-04-06', 'y': 1}, {'x': '2025-04-07', 'y': 14}, {'x': '2025-04-08', 'y': 10}], [{'x': '2025-04-04', 'y': 1}, {'x': '2025-04-05', 'y': 1}, {'x': '2025-04-06', 'y': 0}, {'x': '2025-04-07', 'y': 5}, {'x': '2025-04-08', 'y': 15}]]"
+list_pkNames,"['川普', '大谷翔平', '柯建銘']"
+list_colors,"['rgba(0,128,0,0.2)', 'rgba(0,255,255,0.2)', 'rgba(0,0,255,0.2)']"
+list_photos,"['https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/TrumpPortrait.jpg/500px-TrumpPortrait.jpg', 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Dodgers_at_Nationals_%2853677192000%29_%28cropped%29.jpg/500px-Dodgers_at_Nationals_%2853677192000%29_%28cropped%29.jpg', 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/%E6%9F%AF%E5%BB%BA%E9%8A%98%E5%A7%94%E5%93%A1.jpg/500px-%E6%9F%AF%E5%BB%BA%E9%8A%98%E5%A7%94%E5%93%A1.jpg']"
+list_freq_news_category,"[[52, 20, 92, 12, 28, 25, 229], [0, 0, 0, 25, 0, 0, 25], [15, 2, 1, 0, 3, 1, 22]]"
+list_category,"['政治', '社會地方', '財經', '運動', '娛樂影劇', '科技', '全部']"
+list_sentiInfo,"[[52, 24, 24], [56, 16, 28], [41, 41, 18]]"
+list_total_articles,"[229, 25, 22]"
+list_total_frequency,"[762, 47, 57]"

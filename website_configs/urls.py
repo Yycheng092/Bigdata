@@ -16,6 +16,7 @@ urlpatterns = [
     path('criminal_information/', include('app_Criminal_Information.urls')),
     path('userkeyword_assoc/', include('app_user_keyword_association.urls')),
     path('userkeyword_senti/', include('app_user_keyword_sentiment.urls')),
+    path('taipei_mayor/', include('app_taipei_mayor.urls')),
 
     path('line_today/', include(('line_today.urls',
          'line_today'), namespace='line_today')),

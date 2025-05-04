@@ -3,7 +3,7 @@ import sys
 
 
 def main():
-    # 告訴 Django 使用 website_configs/settings.py 作為設定檔
+    # 告訴 Django 使用 website_configs/settings.py 作為設定檔python manage.py startapp
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'website_configs.settings')
 
     try:
