@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'line_today',
     'app_user_keyword_sentiment',
     'app_taipei_mayor',
+    'app_top_person_db',
+    'app_user_keyword_db',
+
 ]
 
 # 　每次請求前後需經過哪些保全或過濾機制 / 中介軟體 (Middleware)

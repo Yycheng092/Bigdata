@@ -17,6 +17,19 @@ urlpatterns = [
     path('userkeyword_assoc/', include('app_user_keyword_association.urls')),
     path('userkeyword_senti/', include('app_user_keyword_sentiment.urls')),
     path('taipei_mayor/', include('app_taipei_mayor.urls')),
+    # full text search and associated keyword display using db
+    path('userkeyword_db/', include('app_user_keyword_db.urls')),
+
+
+
+
+    # full text search and associated keyword display using db
+    path('topperson_db/', include(('app_top_person_db.urls'))),
+
+    # admin 後台資料庫管理
+    path('admin/', admin.site.urls),
+
+
 
     path('line_today/', include(('line_today.urls',
          'line_today'), namespace='line_today')),
